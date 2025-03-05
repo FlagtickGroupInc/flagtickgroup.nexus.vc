@@ -1,0 +1,12 @@
+|-- Download file .pem from VPS Remote server.
+   | ssh-keygen -f "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\rsa.pem" -y > "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\rsa.pub"
+   | Public Key (VPS) To (Github SSH)
+
+
+ssh-keygen -t rsa -b 2048 -m PEM -f ~/.ssh/authorized_keys
+ssh -i "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\test.pem" ubuntu@13.250.31.106
+
+mysqldump -u root -p admin_auth > admin_auth_backup.sql
+
+GIS BASH
+scp -i "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\test.pem" ubuntu@13.250.31.106:admin_auth_backup.sql ~/Desktop/

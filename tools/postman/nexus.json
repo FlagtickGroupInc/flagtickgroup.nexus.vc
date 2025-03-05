@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "ae92fbdc-b6ae-46a4-ad68-7d9ee36d5f4d",
+		"name": "Nexus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30348700"
+	},
+	"item": [
+		{
+			"name": "Get Packages List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{base64Auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/packages.json",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"packages.json"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://local-nexus.flagtickgroup.com/repository/composer-packages"
+		},
+		{
+			"key": "base64Auth",
+			"value": "BASE64_ENCODED_CREDENTIALS"
+		}
+	]
+}
+
