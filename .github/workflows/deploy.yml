@@ -21,15 +21,27 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
+      - name: Set Environment Variables from Secrets
+        run: |
+          echo "VPS_IP=${{ secrets.VPS_IP }}" >> $GITHUB_ENV
+          echo "VPS_SSH_USER=${{ secrets.VPS_SSH_USER }}" >> $GITHUB_ENV
+
+      - name: Debug Secrets (Check if Variables Exist)
+        run: |
+          echo "Checking VPS_IP and VPS_SSH_USER..."
+          if [[ -z "$VPS_IP" || -z "$VPS_SSH_USER" ]]; then
+            echo "❌ VPS_IP or VPS_SSH_USER is not set!"
+            exit 1
+          else
+            echo "✅ VPS_IP and VPS_SSH_USER are set."
+          fi
+
       - name: Add Known Hosts
         run: |
           mkdir -p ~/.ssh
-          if [[ -z "${{ env.VPS_IP }}" ]]; then
-            echo "Error: VPS_IP is not set!" >&2
-            exit 1
-          fi
-          ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: ssh-keyscan failed, proceeding anyway"
+          ssh-keyscan -H "$VPS_IP" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-      
+
       - name: Deploy Code
-        run: ssh $VPS_SSH_USER@$VPS_IP 'bash -s' < .github/scripts/deploy.sh
+        run: |
+          ssh "$VPS_SSH_USER@$VPS_IP" 'bash -s' < .github/scripts/deploy.sh
