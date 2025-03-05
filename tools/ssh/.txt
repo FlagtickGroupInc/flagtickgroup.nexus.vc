@@ -1,12 +1,5 @@
-|-- Download file .pem from VPS Remote server.
-   | ssh-keygen -f "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\rsa.pem" -y > "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\rsa.pub"
-   | Public Key (VPS) To (Github SSH)
+Copy the plaintext from C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pub, 
+paste it into your LightSail VPS, and rename the file to authorized_keys.
 
-
-ssh-keygen -t rsa -b 2048 -m PEM -f ~/.ssh/authorized_keys
-ssh -i "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\test.pem" ubuntu@13.250.31.106
-
-mysqldump -u root -p admin_auth > admin_auth_backup.sql
-
-GIS BASH
-scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\test.pem" ubuntu@13.250.31.106:admin_auth_backup.sql ~/Desktop/
+# ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ec2-user@54.179.53.222
+# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ec2-user@54.179.53.222:admin_auth_backup.sql ~/Desktop/
