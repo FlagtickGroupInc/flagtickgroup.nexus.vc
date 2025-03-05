@@ -23,9 +23,9 @@ jobs:
 
       - name: Set Environment Variables
         run: |
-          echo "VPS_SSH_USER=ubuntu" >> $GITHUB_ENV
+          echo "VPS_SSH_USER=ec2-user" >> $GITHUB_ENV
           echo "VPS_IP=54.179.53.222" >> $GITHUB_ENV
-          echo "DEPLOY_DIR=/var/www/mywebsite" >> $GITHUB_ENV
+          echo "DEPLOY_DIR=/var/www/nexus" >> $GITHUB_ENV
 
       - name: Deploy Code & Setup Nginx
         run: ssh $VPS_SSH_USER@$VPS_IP 'bash -s' < .github/scripts/deploy.sh

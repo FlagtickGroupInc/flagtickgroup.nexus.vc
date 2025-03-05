@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Variables
-DEPLOY_DIR="/var/www/mywebsite"
-GIT_REPO="git@github.com:yourusername/yourrepo.git"
+DEPLOY_DIR="/var/www/nexus"
+GIT_REPO="git@github.com:FlagtickGroupInc/flagtickgroup.nexus.vc.git"
 BRANCH="master"
 
 echo "🚀 Updating system and installing dependencies..."
