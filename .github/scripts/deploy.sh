@@ -14,6 +14,12 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   REPO_PATH="/home/ec2-user/flagtickgroup.nexus.vc"
   SSH_KEY_PATH="/home/ec2-user/.ssh/rsa.pem"
 
+  # Ensure Git is installed
+  if ! command -v git &> /dev/null; then
+    echo "Git not found, installing Git..."
+    sudo yum install -y git || sudo apt-get install -y git || { echo "Failed to install Git."; exit 1; }
+  fi
+
   if [ ! -d "$REPO_PATH" ]; then
     echo "Project directory not found. Cloning repository..."
     
