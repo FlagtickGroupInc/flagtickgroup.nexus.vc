@@ -8,40 +8,58 @@ on:
       - dev
 
 jobs:
+  # Deploy to VPS Job
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/master' && 'prod' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
 
     steps:
+      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Set up SSH to connect to the VPS
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
-
-      - name: Set Environment Variables from Secrets
+      
+      # Install Docker and dependencies (remove conflicts)
+      - name: Install Docker and dependencies
         run: |
-          echo "VPS_IP=${{ secrets.VPS_IP }}" >> $GITHUB_ENV
-          echo "VPS_SSH_USER=${{ secrets.VPS_SSH_USER }}" >> $GITHUB_ENV
+          sudo apt-get update
 
-      - name: Debug Secrets (Check if Variables Exist)
-        run: |
-          echo "Checking VPS_IP and VPS_SSH_USER..."
-          if [[ -z "$VPS_IP" || -z "$VPS_SSH_USER" ]]; then
-            echo "❌ VPS_IP or VPS_SSH_USER is not set!"
-            exit 1
-          else
-            echo "✅ VPS_IP and VPS_SSH_USER are set."
-          fi
+          # Remove any conflicting Docker and containerd packages
+          sudo apt-get remove -y containerd containerd.io docker docker.io docker-engine
 
-      - name: Add Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "$VPS_IP" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+          # Install dependencies for Docker installation
+          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
-      - name: Deploy Code
+          # Add Docker's official GPG key
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/trusted.gpg.d/docker.asc
+
+          # Add Docker's official repository
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+          # Update package index
+          sudo apt-get update
+
+          # Install Docker Engine and containerd.io
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+          # Install Docker Compose
+          sudo apt-get install -y docker-compose
+      
+      # Define environment variables for deploy.sh
+      - name: Set Environment Variables (Hardcoded)
         run: |
-          ssh "$VPS_SSH_USER@$VPS_IP" 'bash -s' < .github/scripts/deploy.sh
+          echo "VPS_SSH_USER=ec2-user" >> $GITHUB_ENV
+          echo "VPS_IP=18.142.229.15" >> $GITHUB_ENV
+      
+      # Make deploy.sh executable
+      - name: Make deploy.sh executable
+        run: chmod +x .github/scripts/deploy.sh
+      
+      # Run the deploy.sh script
+      - name: Deploy to VPS
+        run: .github/scripts/deploy.sh

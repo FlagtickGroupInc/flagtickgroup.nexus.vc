@@ -1,0 +1,40 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - nexus
+    networks:
+      - web_server
+    
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+      - ./resources/plugins:/nexus-data/deploy
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS=-Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=75 -XX:G1ReservePercent=25 -XX:SoftRefLRUPolicyMSPerMB=50 -XX:+AlwaysPreTouch -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+    networks:
+      - web_server
+
+networks:
+  web_server:
+    driver: bridge
+
+volumes:
+  nexus-data:
+    driver: local
+  sonarqube_db_data: 
+    driver: local
+  flagtickgroup_db_data:
+    driver: local

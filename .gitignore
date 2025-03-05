@@ -1,7 +1,6 @@
 # Use `git rm --cached <file/folder>` to remove the file or folder from the staging area and apply the skip in the .gitignore file.
 # Ignore JetBrains IDE files
 .idea/
-docker-compose.yml
 
 # Ignore everything in the db folder under resources.flagtickgroup
 !resources.flagtickgroup/db/
