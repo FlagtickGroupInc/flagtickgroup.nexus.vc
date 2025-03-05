@@ -24,8 +24,12 @@ jobs:
       - name: Add Known Hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
+          if [[ -z "${{ env.VPS_IP }}" ]]; then
+            echo "Error: VPS_IP is not set!" >&2
+            exit 1
+          fi
+          ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: ssh-keyscan failed, proceeding anyway"
           chmod 644 ~/.ssh/known_hosts
-
+      
       - name: Deploy Code
         run: ssh $VPS_SSH_USER@$VPS_IP 'bash -s' < .github/scripts/deploy.sh
