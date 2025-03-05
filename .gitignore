@@ -15,5 +15,8 @@ resources/terraform/.terraform.tfstate.lock.info
 resources/terraform/terraform.tfstate
 resources/terraform/terraform.tfstate.backup
 
+tools/ssh/rsa.pem
+tools/ssh/rsa.pub
+
 !tools/
 tools/libraries/vendor.zip

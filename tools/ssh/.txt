@@ -9,4 +9,4 @@ ssh -i "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\test.pem" ubun
 mysqldump -u root -p admin_auth > admin_auth_backup.sql
 
 GIS BASH
-scp -i "C:\Users\admin\Documents\flagtickgroup.suite.vc\tools\ssh\test.pem" ubuntu@13.250.31.106:admin_auth_backup.sql ~/Desktop/
+scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\test.pem" ubuntu@13.250.31.106:admin_auth_backup.sql ~/Desktop/
