@@ -62,11 +62,15 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
     sudo systemctl start docker || { echo "Failed to start Docker."; exit 1; }
   fi
 
+  # Ensure pip and dependencies are installed
+  echo "Installing pip and required dependencies..."
+  sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
+  python3 -m pip install --upgrade pip setuptools wheel || { echo "Failed to upgrade pip."; exit 1; }
+
   # Ensure docker-compose is installed
   if ! command -v docker-compose &> /dev/null; then
     echo "Installing docker-compose..."
-    sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
-    sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+    python3 -m pip install --no-cache-dir docker-compose || { echo "Failed to install docker-compose."; exit 1; }
   fi
 
   # Stop and remove existing containers
