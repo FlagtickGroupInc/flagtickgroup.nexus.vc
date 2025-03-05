@@ -2,4 +2,6 @@ Copy the plaintext from C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tool
 paste it into your LightSail VPS, and rename the file to authorized_keys.
 
 # ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ec2-user@54.179.53.222
-# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ec2-user@54.179.53.222:admin_auth_backup.sql ~/Desktop/
+# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ec2-user@54.179.53.222:~/.ssh/
+
+

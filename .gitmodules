@@ -1,4 +1,0 @@
-[submodule "vc.flagtickgroup"]
-	path = vc.flagtickgroup
-	url = git@github.com:FlagtickGroupInc/vc.flagtickgroup.git
-	branch = master
