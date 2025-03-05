@@ -56,6 +56,14 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
     sudo yum install -y docker || sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
   fi
 
+  # Ensure the user has permission to use Docker
+  if ! groups | grep -q '\bdocker\b'; then
+    echo "Adding user to Docker group..."
+    sudo usermod -aG docker $(whoami) || { echo "Failed to add user to Docker group."; exit 1; }
+    echo "Please log out and log back in or restart the server for changes to take effect."
+    exit 1
+  fi
+
   # Ensure Docker is running
   if ! systemctl is-active --quiet docker; then
     echo "Starting Docker service..."
@@ -91,11 +99,11 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   # Stop and remove existing containers
   echo "Stopping existing Docker services..."
-  docker-compose down || { echo "Failed to stop containers."; exit 1; }
+  sudo docker-compose down || { echo "Failed to stop containers."; exit 1; }
 
   # Start Docker services without scaling missing ones
   echo "Starting Docker services..."
-  docker-compose up -d --build || { echo "Failed to start containers."; exit 1; }
+  sudo docker-compose up -d --build || { echo "Failed to start containers."; exit 1; }
 
   echo "Waiting for Nexus to be ready..."
   until curl --output /dev/null --silent --head --fail http://localhost:8081; do
