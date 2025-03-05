@@ -62,24 +62,40 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
     sudo systemctl start docker || { echo "Failed to start Docker."; exit 1; }
   fi
 
-  # Ensure pip and dependencies are installed
-  echo "Installing pip and required dependencies..."
-  sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
-  python3 -m pip install --upgrade pip setuptools wheel || { echo "Failed to upgrade pip."; exit 1; }
+  # Ensure Python3 and pip are installed
+  if ! command -v python3 &> /dev/null; then
+    echo "Installing Python3..."
+    sudo yum install -y python3 || sudo apt-get install -y python3 || { echo "Failed to install Python3."; exit 1; }
+  fi
+  if ! command -v pip3 &> /dev/null; then
+    echo "Installing pip3..."
+    sudo yum install -y python3-pip || sudo apt-get install -y python3-pip || { echo "Failed to install pip3."; exit 1; }
+  fi
 
   # Ensure docker-compose is installed
   if ! command -v docker-compose &> /dev/null; then
     echo "Installing docker-compose..."
-    python3 -m pip install --no-cache-dir docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+    pip3 install --user docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+
+    # Add ~/.local/bin to PATH
+    export PATH=\$HOME/.local/bin:\$PATH
+    echo 'export PATH=\$HOME/.local/bin:\$PATH' >> ~/.bashrc
+    source ~/.bashrc
+  fi
+
+  # Verify docker-compose installation
+  if ! command -v docker-compose &> /dev/null; then
+    echo "docker-compose still not found. Exiting."
+    exit 1
   fi
 
   # Stop and remove existing containers
   echo "Stopping existing Docker services..."
-  sudo docker-compose down || { echo "Failed to stop containers."; exit 1; }
+  docker-compose down || { echo "Failed to stop containers."; exit 1; }
 
   # Start Docker services without scaling missing ones
   echo "Starting Docker services..."
-  sudo docker-compose up -d --build || { echo "Failed to start containers."; exit 1; }
+  docker-compose up -d --build || { echo "Failed to start containers."; exit 1; }
 
   echo "Waiting for Nexus to be ready..."
   until curl --output /dev/null --silent --head --fail http://localhost:8081; do
