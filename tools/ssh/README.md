@@ -45,3 +45,7 @@ sudo docker logs nexus
 - SSH : TCP : 22
 - HTTP : TCP : 80
 - HTTPS : TCP : 443 
+
+## Add Nexus Domain to Hosts File: Mapping 47.129.59.175 to nexus.flagtickgroup.com in /etc/hosts.
+
+## Change the A record for `nexus.flagtickgroup.com` in Cloudflare to point to the IP address `47.129.59.175`.
