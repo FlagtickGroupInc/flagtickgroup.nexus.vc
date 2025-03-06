@@ -99,3 +99,5 @@ sudo cp /etc/letsencrypt/live/flagtickgroup.com-0001/privkey.pem /home/ubuntu/pr
 scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@18.139.110.191:/home/ubuntu/fullchain.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.crt
 scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@18.139.110.191:/home/ubuntu/privkey.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.key
 ```
+
+**Note:** Modify the A record for `flagtickgroup.com` in Cloudflare to point to the correct IP address instead of the temporary Ubuntu server, allowing Certbot to generate a wildcard SSL certificate.
