@@ -3,7 +3,7 @@ set -e  # Exit on error
 
 echo "🚀 Deploying Nexus on VPS..."
 
-ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
+ssh -A -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   set -e
 
@@ -16,12 +16,9 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   chmod 700 ~/.ssh
   ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
-  SSH_KEY_PATH="/home/ubuntu/.ssh/rsa.pem"
-  sudo chown ubuntu:ubuntu "$SSH_KEY_PATH"
-  chmod 400 "$SSH_KEY_PATH"
-
   eval "\$(ssh-agent -s)"
-  ssh-add "$SSH_KEY_PATH"
+  export SSH_AUTH_SOCK=/tmp/ssh-agent.socket
+  ssh-add ~/.ssh/id_rsa  # Use agent forwarding, no need for rsa.pem
 
   echo "🔹 Checking SSH access..."
   ssh -T git@github.com || { echo "❌ SSH to GitHub failed."; exit 1; }
