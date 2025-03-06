@@ -71,8 +71,8 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   # Install docker-compose if not installed
   if ! command -v docker-compose &> /dev/null; then
     echo "Installing docker-compose..."
-    sudo apt-get install -y python3-pip
-    sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+    sudo apt-get update -y
+    sudo apt-get install -y docker-compose || { echo "Failed to install docker-compose."; exit 1; }
   fi
 
   # Restart containers if docker-compose.yml exists
