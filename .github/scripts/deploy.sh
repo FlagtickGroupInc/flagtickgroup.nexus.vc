@@ -23,7 +23,14 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   elif command -v dnf &> /dev/null; then
     echo "🔹 Detected Amazon Linux / Red Hat - Using dnf"
-    sudo dnf install -y docker docker-compose
+    sudo dnf install -y docker
+
+    # Install Docker Compose manually
+    echo "🔹 Installing Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+
+    # Enable and start Docker
     sudo systemctl enable docker
     sudo systemctl start docker
 
@@ -32,7 +39,7 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
     exit 1
   fi
 
-  echo "✅ Docker and dependencies installed."
+  echo "✅ Docker and Docker Compose installed."
 
   echo "🔹 Cloning or updating Nexus repository..."
   REPO_URL="git@github.com:FlagtickGroupInc/flagtickgroup.nexus.vc.git"
