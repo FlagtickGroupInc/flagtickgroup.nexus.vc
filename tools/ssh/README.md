@@ -1,8 +1,8 @@
 Copy the plaintext from C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pub, 
 paste it into your LightSail VPS, and rename the file to authorized_keys (Using vi <file>)
 
-# ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175
-# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175:~/.ssh/
+# ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@54.169.122.93
+# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@54.169.122.93:~/.ssh/
 
 Note for Building on a New VPS:
 - Approve the SSH key at GitHub SSH Keys.
@@ -46,9 +46,12 @@ sudo docker logs nexus
 - HTTP : TCP : 80
 - HTTPS : TCP : 443 
 
-## Add Nexus Domain to Hosts File: Mapping 47.129.59.175 to nexus.flagtickgroup.com in /etc/hosts.
+## Add Nexus Domain to Hosts File: Mapping 54.169.122.93 to nexus.flagtickgroup.com in /etc/hosts.
+```shell
+54.169.122.93 nexus.flagtickgroup.com
+```
 
-## Change the A record for `nexus.flagtickgroup.com` in Cloudflare to point to the IP address `47.129.59.175`.
+## Change the A record for `nexus.flagtickgroup.com` in Cloudflare to point to the IP address `54.169.122.93`.
 
 ## Enable UFW and Allow Ports
 ```shell

@@ -96,8 +96,8 @@ sudo chmod 644 /etc/letsencrypt/live/flagtickgroup.com-0001/privkey.pem
 sudo cp /etc/letsencrypt/live/flagtickgroup.com-0001/fullchain.pem /home/ubuntu/fullchain.pem
 sudo cp /etc/letsencrypt/live/flagtickgroup.com-0001/privkey.pem /home/ubuntu/privkey.pem
 
-scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175:/home/ubuntu/fullchain.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.crt
-scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175:/home/ubuntu/privkey.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.key
+scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@54.169.122.93:/home/ubuntu/fullchain.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.crt
+scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@54.169.122.93:/home/ubuntu/privkey.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.key
 ```
 
 **Note:** Modify the A record for `flagtickgroup.com` in Cloudflare to point to the correct IP address instead of 
