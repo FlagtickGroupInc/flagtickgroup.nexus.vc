@@ -10,7 +10,7 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   REPO_URL="git@github.com:FlagtickGroupInc/flagtickgroup.nexus.vc.git"
   REPO_PATH="/home/ec2-user/flagtickgroup.nexus.vc"
-  SSH_KEY_PATH="/home/ec2-user/.ssh/id_rsa.pem"
+  SSH_KEY_PATH="/home/ec2-user/.ssh/rsa.pem"
 
   if ! command -v git &> /dev/null; then
     sudo yum install -y git || sudo dnf install -y git || sudo apt-get install -y git || { echo "❌ Failed to install Git"; exit 1; }
