@@ -49,3 +49,18 @@ sudo docker logs nexus
 ## Add Nexus Domain to Hosts File: Mapping 47.129.59.175 to nexus.flagtickgroup.com in /etc/hosts.
 
 ## Change the A record for `nexus.flagtickgroup.com` in Cloudflare to point to the IP address `47.129.59.175`.
+
+## Enable UFW and Allow Ports
+```shell
+sudo ufw enable  # Enable the firewall
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp  # Allow HTTP
+sudo ufw allow 443/tcp  # Allow HTTPS
+sudo ufw reload  # Reload UFW rules (optional)
+```
+
+## Verify the Status
+Check if UFW is active and ports are allowed:
+```shell
+sudo ufw status
+```
