@@ -23,7 +23,11 @@ services:
       - nexus-data:/nexus-data
       - ./resources/plugins:/nexus-data/deploy
     environment:
-      - INSTALL4J_ADD_VM_PARAMS=-Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=75 -XX:G1ReservePercent=25 -XX:SoftRefLRUPolicyMSPerMB=50 -XX:+AlwaysPreTouch -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+      - INSTALL4J_ADD_VM_PARAMS=-Xms512m -Xmx1024m -XX:MaxDirectMemorySize=512m -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=75 -XX:G1ReservePercent=25 -XX:SoftRefLRUPolicyMSPerMB=50 -XX:+AlwaysPreTouch -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     networks:
       - web_server
 
