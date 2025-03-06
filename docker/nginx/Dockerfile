@@ -4,10 +4,10 @@ COPY ./docker/nginx/wild/*  /etc/ssl/
 # ADD Custom Config
 ADD ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
-# ADD ./docker/nginx/conf.d/sub.flagtickgroup.com.conf /etc/nginx/conf.d/sub.flagtickgroup.com.conf
+ADD ./docker/nginx/conf.d/sub.flagtickgroup.com.conf /etc/nginx/conf.d/sub.flagtickgroup.com.conf
 
 # ADD ./resources/docker/nginx/default.conf /etc/nginx/conf.d/default.conf
-ADD ./docker/nginx/conf.d/local.flagtickgroup.com.conf /etc/nginx/conf.d/local.flagtickgroup.com.conf
+# ADD ./docker/nginx/conf.d/local.flagtickgroup.com.conf /etc/nginx/conf.d/local.flagtickgroup.com.conf
 
 # Make Directory - Workspace
 RUN mkdir -p /var/www/vc.flagtickgroup
