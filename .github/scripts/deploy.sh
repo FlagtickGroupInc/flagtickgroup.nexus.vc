@@ -18,7 +18,7 @@ ssh -A -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   eval "\$(ssh-agent -s)"
   export SSH_AUTH_SOCK=/tmp/ssh-agent.socket
-  ssh-add ~/.ssh/id_rsa  # Use agent forwarding, no need for rsa.pem
+  ssh-add ~/.ssh/rsa.pem  # Use agent forwarding, no need for rsa.pem
 
   echo "🔹 Checking SSH access..."
   ssh -T git@github.com || { echo "❌ SSH to GitHub failed."; exit 1; }
