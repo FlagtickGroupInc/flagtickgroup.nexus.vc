@@ -50,67 +50,64 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   git checkout master || { echo "Failed to checkout master branch."; exit 1; }
   git pull origin master || { echo "Failed to pull latest changes from master."; exit 1; }
 
-  # Ensure Docker is installed
-  if ! command -v docker &> /dev/null; then
-    echo "Docker not found, installing Docker..."
-    sudo yum install -y docker || sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
-  fi
-
-  # Ensure the user has permission to use Docker
-  if ! groups | grep -q '\bdocker\b'; then
-    echo "Adding user to Docker group..."
-    sudo usermod -aG docker $(whoami) || { echo "Failed to add user to Docker group."; exit 1; }
-    echo "Please log out and log back in or restart the server for changes to take effect."
-    exit 1
-  fi
-
-  # Ensure Docker is running
-  if ! systemctl is-active --quiet docker; then
-    echo "Starting Docker service..."
-    sudo systemctl start docker || { echo "Failed to start Docker."; exit 1; }
-  fi
-
-  # Ensure Python3 and pip are installed
-  if ! command -v python3 &> /dev/null; then
-    echo "Installing Python3..."
-    sudo yum install -y python3 || sudo apt-get install -y python3 || { echo "Failed to install Python3."; exit 1; }
-  fi
-  if ! command -v pip3 &> /dev/null; then
-    echo "Installing pip3..."
-    sudo yum install -y python3-pip || sudo apt-get install -y python3-pip || { echo "Failed to install pip3."; exit 1; }
-  fi
-
-  # Ensure docker-compose is installed
-  if ! command -v docker-compose &> /dev/null; then
-    echo "Installing docker-compose..."
-    pip3 install --user docker-compose || { echo "Failed to install docker-compose."; exit 1; }
-
-    # Add ~/.local/bin to PATH
-    export PATH=\$HOME/.local/bin:\$PATH
-    echo 'export PATH=\$HOME/.local/bin:\$PATH' >> ~/.bashrc
-    source ~/.bashrc
-  fi
-
-  # Verify docker-compose installation
-  if ! command -v docker-compose &> /dev/null; then
-    echo "docker-compose still not found. Exiting."
-    exit 1
-  fi
-
-  # Stop and remove existing containers
-  echo "Stopping existing Docker services..."
-  sudo docker-compose down || { echo "Failed to stop containers."; exit 1; }
-
-  # Start Docker services without scaling missing ones
-  echo "Starting Docker services..."
-  sudo docker-compose up -d --build || { echo "Failed to start containers."; exit 1; }
-
-  echo "Waiting for Nexus to be ready..."
-  until curl --output /dev/null --silent --head --fail http://localhost:8081; do
-    echo "Waiting for Nexus..."
-    sleep 10
-  done
-  echo "Nexus is up!"
+  # Install libcrypt if missing (fix for Python error)
+    if ! ldconfig -p | grep -q libcrypt.so.1; then
+      echo "libcrypt.so.1 not found, installing it..."
+      
+      if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
+        sudo yum install -y libxcrypt-compat || { echo "Failed to install libxcrypt-compat."; exit 1; }
+      else
+        sudo apt-get install -y libxcrypt-compat || { echo "Failed to install libxcrypt-compat."; exit 1; }
+      fi
+    else
+      echo "libcrypt.so.1 is already installed."
+    fi
+  
+    # Check if Docker is installed, and install if missing
+    if ! command -v docker &> /dev/null; then
+      echo "Docker not found, installing Docker..."
+  
+      if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
+        sudo yum update -y
+        sudo yum install -y docker || { echo "Failed to install Docker."; exit 1; }
+      else
+        sudo apt-get update
+        sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
+      fi
+    else
+      echo "Docker is already installed."
+    fi
+  
+    # Start Docker service if it's not running
+    if ! systemctl is-active --quiet docker; then
+      echo "Docker service is not running. Starting Docker service..."
+      sudo systemctl start docker || { echo "Failed to start Docker service."; exit 1; }
+    else
+      echo "Docker service is already running."
+    fi
+  
+    # Check if docker-compose is installed, and install if missing
+    if ! command -v docker-compose &> /dev/null; then
+      echo "docker-compose not found, installing docker-compose..."
+  
+      if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
+        sudo yum install -y python3-pip
+        sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+      else
+        sudo apt-get install -y python3-pip
+        sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+      fi
+    else
+      echo "docker-compose is already installed."
+    fi
+    
+    # Stop and remove any running containers
+    if [ -f "docker-compose.yml" ]; then
+      sudo docker-compose down || { echo "Failed to stop containers."; exit 1; }
+      sudo docker-compose up -d --build || { echo "Failed to rebuild and restart containers."; exit 1; }
+    else
+      echo "No docker-compose.yml found. Skipping Docker operations."
+    fi
 
 EOF
 
