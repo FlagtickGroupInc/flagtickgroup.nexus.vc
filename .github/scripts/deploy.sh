@@ -1,51 +1,90 @@
 #!/bin/bash
-set -e  # Exit on error
 
-echo "🚀 Deploying Nexus on VPS..."
+# Exit on error
+set -e
 
-ssh -A -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
+echo "Starting deployment process..."
 
+# SSH into the VPS and deploy the application
+ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   set -e
 
-  echo "🔹 Installing Dependencies..."
-  sudo apt-get update
-  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common git
+  echo "Connected to VPS successfully."
 
-  echo "🔹 Setting up SSH for GitHub..."
-  mkdir -p ~/.ssh
-  chmod 700 ~/.ssh
-  ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-
-  eval "\$(ssh-agent -s)"
-  export SSH_AUTH_SOCK=/tmp/ssh-agent.socket
-  ssh-add ~/.ssh/rsa.pem  # Use agent forwarding, no need for rsa.pem
-
-  echo "🔹 Checking SSH access..."
-  ssh -T git@github.com || { echo "❌ SSH to GitHub failed."; exit 1; }
-
-  REPO_URL="git@github.com:FlagtickGroupInc/flagtickgroup.nexus.vc.git"
-  REPO_PATH="/home/ubuntu/flagtickgroup.nexus.vc"
-
-  echo "🔹 Cloning Repository..."
-  if [ -d "$REPO_PATH" ]; then
-    cd "$REPO_PATH"
-    git reset --hard
-    git pull origin master || { echo "❌ Git pull failed."; exit 1; }
+  # Install Git if not installed
+  if ! command -v git &> /dev/null; then
+    echo "Installing Git..."
+    sudo apt-get update -y
+    sudo apt-get install -y git || { echo "Failed to install Git."; exit 1; }
   else
-    git clone "$REPO_URL" "$REPO_PATH" || { echo "❌ Git clone failed."; exit 1; }
+    echo "Git is already installed."
   fi
 
+  REPO_PATH="/home/ubuntu/flagtickgroup.nexus.vc"
+  SSH_KEY_PATH="/home/ubuntu/.ssh/rsa.pem"
+
+  # Ensure SSH key permissions are correct
+  chmod 600 "$SSH_KEY_PATH"
+
+  # Add GitHub to known hosts
+  ssh-keyscan -H github.com >> ~/.ssh/known_hosts || { echo "Failed to add GitHub key."; exit 1; }
+
+  # Set custom SSH command for Git
+  git config --global core.sshCommand "ssh -i $SSH_KEY_PATH"
+
+  # Clone or pull repository
+  if [ ! -d "$REPO_PATH/.git" ]; then
+    echo "Cloning repository..."
+    rm -rf "$REPO_PATH"
+    git clone git@github.com:FlagtickGroupInc/flagtickgroup.nexus.vc.git "$REPO_PATH" || {
+      echo "Failed to clone repository."; exit 1;
+    }
+  else
+    echo "Repository found. Pulling latest changes..."
+    cd "$REPO_PATH"
+    git checkout master || { echo "Failed to checkout master branch."; exit 1; }
+    git pull origin master || { echo "Failed to pull latest changes."; exit 1; }
+  fi
+
+  # Install libcrypt-compat if missing
+  if ! ldconfig -p | grep -q libcrypt.so.1; then
+    echo "Installing libcrypt-compat..."
+    sudo apt-get install -y libxcrypt-compat || { echo "Failed to install libxcrypt-compat."; exit 1; }
+  fi
+
+  # Install Docker if not installed
+  if ! command -v docker &> /dev/null; then
+    echo "Installing Docker..."
+    sudo apt-get update -y
+    sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
+    sudo systemctl enable --now docker
+  else
+    echo "Docker is already installed."
+  fi
+
+  # Ensure Docker is running
+  if ! systemctl is-active --quiet docker; then
+    echo "Starting Docker service..."
+    sudo systemctl start docker || { echo "Failed to start Docker."; exit 1; }
+  fi
+
+  # Install docker-compose if not installed
+  if ! command -v docker-compose &> /dev/null; then
+    echo "Installing docker-compose..."
+    sudo apt-get install -y python3-pip
+    sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
+  fi
+
+  # Restart containers if docker-compose.yml exists
   cd "$REPO_PATH"
-
-  echo "🔹 Fixing Docker Permissions..."
-  sudo usermod -aG docker ubuntu
-  newgrp docker
-  sudo systemctl enable --now docker
-  sudo systemctl restart docker
-
-  echo "🔹 Deploying with Docker..."
-  docker system prune -f
-  docker-compose down --remove-orphans
-  docker-compose up -d --build || { echo "❌ Docker Compose failed."; exit 1; }
+  if [ -f "docker-compose.yml" ]; then
+    echo "Restarting containers..."
+    sudo docker-compose down || { echo "Failed to stop containers."; exit 1; }
+    sudo docker-compose up -d --build || { echo "Failed to restart containers."; exit 1; }
+  else
+    echo "No docker-compose.yml found. Skipping Docker operations."
+  fi
 
 EOF
+
+echo "Deployment process completed successfully!"
