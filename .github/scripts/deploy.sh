@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Exit on error
+# Exit on any error
 set -e
 
 echo "Starting deployment process..."
@@ -16,7 +16,7 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
 
   # Install Git if missing
   if ! command -v git &> /dev/null; then
-    sudo yum install -y git || sudo apt-get install -y git || { echo "Failed to install Git."; exit 1; }
+    sudo yum install -y git || sudo dnf install -y git || sudo apt-get install -y git || { echo "Failed to install Git."; exit 1; }
   fi
 
   # Ensure proper SSH authentication for GitHub
@@ -49,7 +49,7 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   # Ensure Docker is installed and running
   if ! command -v docker &> /dev/null; then
     echo "Installing Docker..."
-    sudo yum install -y docker || sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
+    sudo yum install -y docker || sudo dnf install -y docker || sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
   fi
 
   # Start Docker service if not running
@@ -61,13 +61,19 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   if python3 -c "import requests" &> /dev/null; then
     if rpm -q python3-requests &> /dev/null; then
       echo "Removing system-installed requests package..."
-      sudo yum remove -y python3-requests || sudo apt-get remove -y python3-requests || { echo "Failed to remove system requests package."; exit 1; }
+      sudo yum remove -y python3-requests || sudo dnf remove -y python3-requests || sudo apt-get remove -y python3-requests || { echo "Failed to remove system requests package."; exit 1; }
     fi
   fi
 
-  # Ensure pip is installed and updated
-  sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
-  sudo pip3 install --upgrade pip
+  # **Fix pip upgrade issue**
+  echo "Removing system-installed python3-pip..."
+  sudo yum remove -y python3-pip || sudo dnf remove -y python3-pip || sudo apt-get remove -y python3-pip || { echo "Failed to remove system-installed pip."; exit 1; }
+
+  echo "Installing pip from source..."
+  curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3 || { echo "Failed to install pip."; exit 1; }
+
+  # Verify pip installation
+  pip3 --version || { echo "pip installation failed."; exit 1; }
 
   # Install wheel before upgrading docker-compose
   sudo pip3 install --upgrade wheel
