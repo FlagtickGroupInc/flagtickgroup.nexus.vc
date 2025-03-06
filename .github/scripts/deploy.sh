@@ -57,14 +57,28 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
     sudo systemctl start docker || { echo "Failed to start Docker service."; exit 1; }
   fi
 
+  # Fix requests package issue
+  if python3 -c "import requests" &> /dev/null; then
+    if rpm -q python3-requests &> /dev/null; then
+      echo "Removing system-installed requests package..."
+      sudo yum remove -y python3-requests || sudo apt-get remove -y python3-requests || { echo "Failed to remove system requests package."; exit 1; }
+    fi
+  fi
+
+  # Ensure pip is installed and updated
+  sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
+  sudo pip3 install --upgrade pip
+
+  # Install wheel before upgrading docker-compose
+  sudo pip3 install --upgrade wheel
+
   # Ensure docker-compose and dependencies are installed and updated
   if ! command -v docker-compose &> /dev/null; then
     echo "Installing docker-compose..."
-    sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
-    sudo pip3 install --upgrade docker-compose docker || { echo "Failed to install or update docker-compose."; exit 1; }
+    sudo pip3 install --upgrade docker-compose docker || { echo "Failed to install docker-compose."; exit 1; }
   else
     echo "Updating docker-compose and dependencies..."
-    sudo pip3 install --upgrade docker-compose docker || { echo "Failed to update docker-compose."; exit 1; }
+    sudo pip3 install --ignore-installed requests --upgrade docker-compose docker || { echo "Failed to update docker-compose."; exit 1; }
   fi
 
   # Stop and remove old containers if they exist
