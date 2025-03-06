@@ -100,4 +100,11 @@ scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" u
 scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@18.139.110.191:/home/ubuntu/privkey.pem C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\flagtickgroup.com.key
 ```
 
-**Note:** Modify the A record for `flagtickgroup.com` in Cloudflare to point to the correct IP address instead of the temporary Ubuntu server, allowing Certbot to generate a wildcard SSL certificate.
+**Note:** Modify the A record for `flagtickgroup.com` in Cloudflare to point to the correct IP address instead of 
+the temporary Ubuntu server, allowing Certbot to generate a wildcard SSL certificate.
+Furthermore, since Nginx is used for Certbot on the remote server, remove it to avoid conflicts with the GitHub Actions pipeline.
+```shell
+sudo lsof -i :80
+sudo systemctl stop nginx
+sudo systemctl disable nginx
+```
