@@ -27,7 +27,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "VPS_SSH_USER=ubuntu" >> $GITHUB_ENV
-          echo "VPS_IP=18.139.110.191" >> $GITHUB_ENV
+          echo "VPS_IP=47.129.59.175" >> $GITHUB_ENV
       
       # Make deploy.sh executable
       - name: Make deploy.sh executable

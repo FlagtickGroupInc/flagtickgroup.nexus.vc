@@ -1,8 +1,8 @@
 Copy the plaintext from C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pub, 
 paste it into your LightSail VPS, and rename the file to authorized_keys (Using vi <file>)
 
-# ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@18.139.110.191
-# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@18.139.110.191:~/.ssh/
+# ssh -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175
+# scp -i "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" "C:\Users\admin\Documents\eco\flagtickgroup.nexus.vc\tools\ssh\rsa.pem" ubuntu@47.129.59.175:~/.ssh/
 
 Note for Building on a New VPS:
 - Approve the SSH key at GitHub SSH Keys.
@@ -40,20 +40,6 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
 sudo docker logs nexus
-
-## Enable UFW and Allow Ports
-```shell
-sudo ufw enable  # Enable the firewall
-sudo ufw allow 80/tcp  # Allow HTTP
-sudo ufw allow 443/tcp  # Allow HTTPS
-sudo ufw reload  # Reload UFW rules (optional)
-```
-
-## Verify the Status
-Check if UFW is active and ports are allowed:
-```shell
-sudo ufw status
-```
 
 ## Navigate to the Networking tab and configure the IPv4 Firewall in the instance where the public IP is accessible on Lightsail.
 - SSH : TCP : 22
