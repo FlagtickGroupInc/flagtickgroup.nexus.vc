@@ -26,8 +26,8 @@ jobs:
       # Define environment variables for deploy.sh
       - name: Set Environment Variables
         run: |
-          echo "VPS_SSH_USER=ec2-user" >> $GITHUB_ENV
-          echo "VPS_IP=54.179.53.222" >> $GITHUB_ENV
+          echo "VPS_SSH_USER=ubuntu" >> $GITHUB_ENV
+          echo "VPS_IP=18.139.110.191" >> $GITHUB_ENV
       
       # Make deploy.sh executable
       - name: Make deploy.sh executable
