@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy Nexus to VPS
 
 on:
   push:
@@ -8,58 +8,26 @@ on:
       - dev
 
 jobs:
-  # Deploy to VPS Job
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/master' && 'prod' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
 
     steps:
-      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Set up SSH to connect to the VPS
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
-      
-      # Install Docker and dependencies (remove conflicts)
-      - name: Install Docker and dependencies
-        run: |
-          sudo apt-get update
 
-          # Remove any conflicting Docker and containerd packages
-          sudo apt-get remove -y containerd containerd.io docker docker.io docker-engine
-
-          # Install dependencies for Docker installation
-          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-          # Add Docker's official GPG key
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/trusted.gpg.d/docker.asc
-
-          # Add Docker's official repository
-          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-          # Update package index
-          sudo apt-get update
-
-          # Install Docker Engine and containerd.io
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-          # Install Docker Compose
-          sudo apt-get install -y docker-compose
-      
-      # Define environment variables for deploy.sh
-      - name: Set Environment Variables (Hardcoded)
+      - name: Set Environment Variables
         run: |
           echo "VPS_SSH_USER=ec2-user" >> $GITHUB_ENV
           echo "VPS_IP=54.179.53.222" >> $GITHUB_ENV
-      
-      # Make deploy.sh executable
+
       - name: Make deploy.sh executable
         run: chmod +x .github/scripts/deploy.sh
-      
-      # Run the deploy.sh script
+
       - name: Deploy to VPS
         run: .github/scripts/deploy.sh
