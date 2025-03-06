@@ -46,51 +46,25 @@ ssh -o StrictHostKeyChecking=no "$VPS_SSH_USER@$VPS_IP" << 'EOF'
   git checkout master || { echo "Failed to checkout master branch."; exit 1; }
   git pull origin master || { echo "Failed to pull latest changes from master."; exit 1; }
 
-  # Ensure libcrypt.so.1 is installed
-  if ! ldconfig -p | grep -q libcrypt.so.1; then
-    echo "libcrypt.so.1 not found, installing it..."
-    if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
-      sudo yum install -y libxcrypt-compat || { echo "Failed to install libxcrypt-compat."; exit 1; }
-    else
-      sudo apt-get install -y libxcrypt-compat || { echo "Failed to install libxcrypt-compat."; exit 1; }
-    fi
-  else
-    echo "libcrypt.so.1 is already installed."
-  fi
-
   # Ensure Docker is installed and running
   if ! command -v docker &> /dev/null; then
     echo "Installing Docker..."
-    if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
-      sudo yum update -y
-      sudo yum install -y docker || { echo "Failed to install Docker."; exit 1; }
-    else
-      sudo apt-get update
-      sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
-    fi
-  else
-    echo "Docker is already installed."
+    sudo yum install -y docker || sudo apt-get install -y docker.io || { echo "Failed to install Docker."; exit 1; }
   fi
 
   # Start Docker service if not running
   if ! systemctl is-active --quiet docker; then
     sudo systemctl start docker || { echo "Failed to start Docker service."; exit 1; }
-  else
-    echo "Docker service is already running."
   fi
 
-  # Ensure docker-compose is installed
+  # Ensure docker-compose and dependencies are installed and updated
   if ! command -v docker-compose &> /dev/null; then
     echo "Installing docker-compose..."
-    if [ -f /etc/os-release ] && grep -q "Amazon Linux" /etc/os-release; then
-      sudo yum install -y python3-pip
-      sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
-    else
-      sudo apt-get install -y python3-pip
-      sudo pip3 install docker-compose || { echo "Failed to install docker-compose."; exit 1; }
-    fi
+    sudo yum install -y python3-pip || sudo apt-get install -y python3-pip
+    sudo pip3 install --upgrade docker-compose docker || { echo "Failed to install or update docker-compose."; exit 1; }
   else
-    echo "docker-compose is already installed."
+    echo "Updating docker-compose and dependencies..."
+    sudo pip3 install --upgrade docker-compose docker || { echo "Failed to update docker-compose."; exit 1; }
   fi
 
   # Stop and remove old containers if they exist
