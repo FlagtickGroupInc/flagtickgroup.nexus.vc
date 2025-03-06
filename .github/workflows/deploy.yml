@@ -1,4 +1,4 @@
-name: Deploy Nexus to VPS
+name: Deploy to VPS
 
 on:
   push:
@@ -13,21 +13,26 @@ jobs:
     environment: ${{ github.ref == 'refs/heads/master' && 'prod' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
 
     steps:
+      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Set up SSH to connect to the VPS
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
+      # Define environment variables for deploy.sh
       - name: Set Environment Variables
         run: |
           echo "VPS_SSH_USER=ec2-user" >> $GITHUB_ENV
           echo "VPS_IP=54.179.53.222" >> $GITHUB_ENV
-
+      
+      # Make deploy.sh executable
       - name: Make deploy.sh executable
         run: chmod +x .github/scripts/deploy.sh
-
+      
+      # Run the deploy.sh script
       - name: Deploy to VPS
         run: .github/scripts/deploy.sh
